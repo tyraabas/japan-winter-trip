@@ -26,60 +26,7 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}.btn{border:0;bo
 #tripMap{height:370px;border-radius:16px;z-index:1}.map-toolbar{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.map-toolbar select{border:1px solid var(--line);border-radius:99px;padding:9px;background:#fff}.search-results{display:grid;gap:7px;margin-top:8px}.result{padding:10px;border:1px solid var(--line);border-radius:12px;display:flex;justify-content:space-between;gap:10px;align-items:center}.pin-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
 .modal{position:fixed;inset:0;background:#0c161477;display:none;align-items:flex-end;justify-content:center;z-index:30}.modal.open{display:flex}.sheet{background:white;width:min(820px,100%);max-height:88vh;overflow:auto;border-radius:25px 25px 0 0;padding:22px}.sheethead{display:flex;justify-content:space-between;align-items:center}.sheet h3{margin:0;font-size:23px}.close{border:0;border-radius:50%;width:36px;height:36px;background:#eee}.actions{display:flex;gap:8px;margin-top:16px}.actions>*{flex:1}
 footer{text-align:center;color:#98a09e;font-size:12px;padding:18px}.offline{font-size:12px;color:#fff;background:#ffffff20;padding:6px 10px;border-radius:99px}
-@media(max-width:520px){
-  body{font-size:13px}
-  main{padding:15px 11px 40px}
-  .hero{padding:23px 17px}
-  .hero h1{font-size:30px}
-  h2{font-size:20px}
-  .brand,.kicker{font-size:10px}
-  .item-title{font-size:14px!important}
-  .item-sub,.muted,.small-note{font-size:11px}
-  nav a{font-size:11px;padding:8px 11px}
-  .formgrid{grid-template-columns:1fr}
-  #tripMap{height:300px}
-  .card,.map-card{padding:12px;border-radius:17px}
-  .btn{font-size:12px}
-}
-.day-plan{display:none;margin-top:12px}
-.day-plan.open{display:block}
-.timeline{position:relative;margin:12px 0 8px 7px;padding-left:23px}
-.timeline:before{
-  content:"";
-  position:absolute;
-  left:5px;
-  top:8px;
-  bottom:12px;
-  width:2px;
-  background:#d9c5b5;
-}
-.timeline-item{position:relative;padding:5px 0 17px}
-.timeline-item:before{
-  content:"";
-  position:absolute;
-  left:-23px;
-  top:9px;
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  background:#8f3042;
-  border:3px solid #fff;
-  box-shadow:0 0 0 1px #d9c5b5;
-}
-/* Hide editing controls until edit mode */
-.edit-controls{
-  display:none;
-  gap:6px;
-  flex-wrap:wrap;
-}
-
-details.edit-mode .edit-controls{
-  display:flex;
-}
-
-.day-edit-toggle{
-  margin-top:10px;
-}
+@media(max-width:520px){main{padding:20px 13px 50px}.hero{padding:27px 20px}.formgrid{grid-template-columns:1fr}#tripMap{height:330px}.card,.map-card{padding:15px}}
 </style>
 </head>
 <body><div class="app">
@@ -113,66 +60,8 @@ data.days=(data.days||[]).map(d=>({...d,plans:d.plans||[]}));data.food=data.food
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}
 function money(n){return 'RM '+Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function render(){ $('#tripTitle').textContent=data.title;$('#tripSubtitle').textContent=data.subtitle;let done=data.days.filter(d=>d.done).length,pct=data.days.length?Math.round(done/data.days.length*100):0;$('#percent').textContent=pct+'%';$('#fill').style.width=pct+'%';$('#nextMilestone').textContent=data.days.find(d=>!d.done)?'Next milestone: '+data.days.find(d=>!d.done).date:'All milestones completed!';$('#daysCount').textContent=12;
-$('#placesCount').textContent=new Set(data.days.map(d=>d.place)).size;
-$('#dayList').innerHTML=data.days.map((d,i)=>`
-<details class="card">
-  <summary>
-    <div class="kicker">${esc(d.date)}</div>
-    <div class="item-title" style="font-size:17px;margin-top:5px">
-      ${d.done?'✓ ':'📍 '}${esc(d.place)}
-    </div>
-    <div class="item-sub">${esc(d.tag||'')}</div>
-  </summary>
-<button class="btn light small day-edit-toggle"
-
-onclick="this.closest('details').classList.toggle('edit-mode');this.textContent=this.textContent.includes('Edit')?'Done':'✎ Edit'">
-
-✎ Edit
-
-</button>
-  <div class="day-plan open">
-    <p class="item-sub">${esc(d.plan||'')}</p>
-
-   <div class="edit-controls">
-
-  <button class="btn light small" onclick="dayForm(${i})">
-
-    Edit day
-
-  </button>
-
-  <button class="btn light small" onclick="planForm(${i})">
-
-    ＋ Add activity
-
-  </button>
-
-</div>
-
-    <div class="timeline">
-      ${(d.plans||[]).map((p,j)=>`
-        <div class="timeline-item">
-          <b>${esc(p.time||'Anytime')} · ${esc(p.title)}</b>
-          <div class="item-sub">${esc(p.detail||'')}</div>
-         <div class="edit-controls">
-
-  <button class="btn light small" onclick="planForm(${i},${j})">Edit</button>
-
-  <button class="btn danger small" onclick="delPlan(${i},${j})">Delete</button>
-
-</div>
-        </div>
-      `).join('')}
-    </div>
-    <label class="muted">
-      <input type="checkbox" ${d.done?'checked':''}
-      onchange="data.days[${i}].done=this.checked;save();render()">
-      Completed
-    </label>
-  </div>
-</details>
-`).join('');
+function render(){ $('#tripTitle').textContent=data.title;$('#tripSubtitle').textContent=data.subtitle;let done=data.days.filter(d=>d.done).length,pct=data.days.length?Math.round(done/data.days.length*100):0;$('#percent').textContent=pct+'%';$('#fill').style.width=pct+'%';$('#nextMilestone').textContent=data.days.find(d=>!d.done)?'Next milestone: '+data.days.find(d=>!d.done).date:'All milestones completed!';$('#daysCount').textContent=12;$('#placesCount').textContent=new Set(data.days.map(d=>d.place)).size;
+$('#dayList').innerHTML=data.days.map((d,i)=>`<div class="card"><div class="rowline"><div><div class="kicker">${esc(d.date)}</div><div class="item-title" style="font-size:19px;margin-top:5px">${d.done?'✓ ': '📍 '}${esc(d.place)}</div><div class="item-sub">${esc(d.tag||'')}</div></div><button class="btn light small" onclick="dayForm(${i})">Edit</button></div><p class="item-sub">${esc(d.plan||'')}</p>${(d.plans||[]).map((p,j)=>`<div class="item"><div class="rowline"><b>${esc(p.time||'Anytime')} · ${esc(p.title)}</b><span><button class="btn light small" onclick="planForm(${i},${j})">Edit</button> <button class="btn danger small" onclick="delPlan(${i},${j})">Delete</button></span></div><div class="item-sub">${esc(p.detail||'')}</div></div>`).join('')}<div class="rowline" style="margin-top:10px"><button class="btn light small" onclick="planForm(${i})">＋ Add activity</button><label class="muted"><input type="checkbox" ${d.done?'checked':''} onchange="data.days[${i}].done=this.checked;save();render()"> Completed</label></div></div>`).join('');
 $('#foodList').innerHTML=data.food.length?data.food.map((x,i)=>`<div class="check ${x.done?'done':''}"><input type="checkbox" ${x.done?'checked':''} onchange="data.food[${i}].done=this.checked;save();render()"><span class="check-text" style="flex:1">${esc(x.text)}</span><button class="btn light small" onclick="foodForm(${i})">Edit</button><button class="btn danger small" onclick="removeItem('food',${i})">Delete</button></div>`).join(''):'<p class="muted">No food added yet.</p>';
 $('#checkList').innerHTML=data.checklist.length?data.checklist.map((x,i)=>`<div class="check ${x.done?'done':''}"><input type="checkbox" ${x.done?'checked':''} onchange="data.checklist[${i}].done=this.checked;save();render()"><span class="check-text" style="flex:1">${esc(x.text)}</span><button class="btn light small" onclick="checkForm(${i})">Edit</button><button class="btn danger small" onclick="removeItem('checklist',${i})">Delete</button></div>`).join(''):'<p class="muted">Your checklist is empty.</p>';
 $('#budgetList').innerHTML=data.expenses.length?data.expenses.map((x,i)=>`<div class="item"><div class="rowline"><div><div class="item-title">${esc(x.name)}</div><div class="item-sub">${esc(x.category)} · ${esc(x.date||'')}</div></div><b>${money(x.amount)}</b></div><div class="item-actions" style="margin-top:8px"><button class="btn light small" onclick="spendForm(${i})">Edit</button><button class="btn danger small" onclick="removeItem('expenses',${i})">Delete</button></div></div>`).join(''):'<p class="muted">No expenses recorded yet.</p>';
@@ -193,7 +82,7 @@ function saveTextItem(type,i,v){if(!v.trim())return alert('Please enter a name.'
 function spendForm(i=null){let x=i===null?{name:'',category:'Food',amount:'',date:new Date().toISOString().slice(0,10)}:data.expenses[i];modal(i===null?'Add expense':'Edit expense',field('EXPENSE NAME','eName',x.name)+`<div class="formgrid"><div class="field"><label>CATEGORY</label><select id="eCategory">${['Transport','Accommodation','Food','Activities','Shopping','Others'].map(c=>`<option ${x.category===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label>AMOUNT (RM)</label><input id="eAmount" type="number" min="0" step=".01" value="${esc(x.amount)}"></div></div>`+field('DATE','eDate',x.date,'date')+`<div class="actions"><button class="btn light" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveExpense(${i===null?'null':i})">Save expense</button>${i===null?'':`<button class="btn danger" onclick="removeItem('expenses',${i})">Delete</button>`}</div>`)}
 function saveExpense(i){let x={name:$('#eName').value.trim(),category:$('#eCategory').value,amount:Number($('#eAmount').value),date:$('#eDate').value};if(!x.name||!Number.isFinite(x.amount)||x.amount<0)return alert('Enter a name and valid amount.');if(i===null)data.expenses.push(x);else data.expenses[i]=x;closeModal();render()}
 function removeItem(type,i){if(!confirm('Delete this item?'))return;data[type].splice(i,1);closeModal();render()}
-let map,mapLayer,pinLayer,pinMode=false,searchMarker;
+let map,mapLayer,pinMode=false,searchMarker;
 const locations=[['Hakata / Fukuoka',33.5902,130.4017,'Activities'],['Hita',33.3213,130.9409,'Activities'],['Kumamoto',32.8031,130.7079,'Activities'],['Aso',32.9523,131.1217,'Activities'],['Sapporo',43.0618,141.3545,'Activities']];
 function initMap(){if(!window.L)return;map=L.map('tripMap').setView([36.5,137.5],4);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);pinLayer=L.layerGroup().addTo(map);locations.forEach(p=>L.marker([p[1],p[2]]).bindPopup(`<b>${p[0]}</b><br>Trip destination`).addTo(pinLayer));renderPins();setTimeout(()=>map.invalidateSize(),200);map.on('click',e=>{if(!pinMode)return;pinMode=false;let name=prompt('Name this location:');if(!name)return;data.pins.push({name,lat:e.latlng.lat,lng:e.latlng.lng,category:$('#pinCategory').value});render();});}
 function pinIcon(cat){let colors={Activities:'#8f3042',Accommodation:'#386a9b',Food:'#b7791f',Shopping:'#7952a1',Transport:'#367d73',Others:'#68737a'};return colors[cat]||'#68737a'}
