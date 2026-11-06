@@ -26,6 +26,26 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}.btn{border:0;bo
 #tripMap{height:370px;border-radius:16px;z-index:1}.map-toolbar{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.map-toolbar select{border:1px solid var(--line);border-radius:99px;padding:9px;background:#fff}.search-results{display:grid;gap:7px;margin-top:8px}.result{padding:10px;border:1px solid var(--line);border-radius:12px;display:flex;justify-content:space-between;gap:10px;align-items:center}.pin-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
 .modal{position:fixed;inset:0;background:#0c161477;display:none;align-items:flex-end;justify-content:center;z-index:30}.modal.open{display:flex}.sheet{background:white;width:min(820px,100%);max-height:88vh;overflow:auto;border-radius:25px 25px 0 0;padding:22px}.sheethead{display:flex;justify-content:space-between;align-items:center}.sheet h3{margin:0;font-size:23px}.close{border:0;border-radius:50%;width:36px;height:36px;background:#eee}.actions{display:flex;gap:8px;margin-top:16px}.actions>*{flex:1}
 footer{text-align:center;color:#98a09e;font-size:12px;padding:18px}.offline{font-size:12px;color:#fff;background:#ffffff20;padding:6px 10px;border-radius:99px}
+#pdfExport{display:none}
+@media print{
+  @page{size:A4;margin:14mm}
+  body{background:#fff!important;color:#183b3a!important;font-size:11pt!important}
+  body>*{display:none!important}
+  #pdfExport{display:block!important;font-family:Arial, sans-serif;color:#183b3a!important}
+  #pdfExport h1{font-size:25pt;margin:0 0 5px}
+  #pdfExport .pdf-subtitle{color:#667572;margin:0 0 18px;line-height:1.45}
+  #pdfExport .pdf-day{break-inside:avoid;border:1px solid #dfe5e2;border-radius:10px;padding:13px 15px;margin:0 0 12px}
+  #pdfExport .pdf-date{font-size:9pt;letter-spacing:1px;color:#8f3042;font-weight:bold;text-transform:uppercase}
+  #pdfExport h2{font-size:16pt;margin:5px 0}
+  #pdfExport .pdf-tag{font-size:9pt;color:#667572;margin-bottom:8px}
+  #pdfExport .pdf-overview{line-height:1.5;margin:7px 0 10px}
+  #pdfExport .pdf-timeline{border-left:2px solid #d9c5b5;margin:10px 0 0 5px;padding-left:14px}
+  #pdfExport .pdf-point{position:relative;margin:0 0 11px;break-inside:avoid}
+  #pdfExport .pdf-point:before{content:"";position:absolute;left:-20px;top:4px;width:9px;height:9px;border-radius:50%;background:#8f3042;border:2px solid #fff;box-shadow:0 0 0 1px #d9c5b5}
+  #pdfExport .pdf-time{font-size:9pt;color:#8f3042;font-weight:bold}
+  #pdfExport .pdf-detail{font-size:9.5pt;color:#53615e;line-height:1.45;margin-top:3px;white-space:pre-wrap}
+  #pdfExport .pdf-footer{margin-top:20px;text-align:center;font-size:8pt;color:#8a9692}
+}
 @media(max-width:520px){
   body{font-size:13px}
   main{padding:15px 11px 40px}
@@ -91,7 +111,7 @@ details.edit-mode .edit-controls{
 <main>
 <section id="overview"><div class="section-head"><h2>Trip overview</h2></div><div class="card"><div class="progress-head"><div><div class="kicker">❄ Japan trip milestones</div><div class="item-title" style="font-size:20px;margin-top:7px">Daily journey progress</div></div><div class="percent" id="percent">0%</div></div><p class="muted" id="nextMilestone">Next milestone: Day 1</p><div class="track"><div class="fill" id="fill"></div></div><div class="stats"><div class="stat"><b id="daysCount">12</b><span>days in Japan</span></div><div class="stat"><b id="placesCount">5</b><span>places to explore</span></div></div></div></section>
 <section id="trip-map"><div class="section-head"><h2>Interactive trip map</h2></div><div class="map-card"><div class="kicker">Search, explore and save places</div><div class="field"><label for="mapSearch">SEARCH LOCATION, RESTAURANT, HOTEL OR ATTRACTION</label><div style="display:flex;gap:7px"><input id="mapSearch" placeholder="e.g. Dazaifu Tenmangu, hotel in Sapporo" style="min-width:0;flex:1"><button class="btn" onclick="searchPlaces()">Search</button></div><div id="searchResults" class="search-results"></div></div><div class="map-toolbar"><select id="pinCategory" aria-label="Pin category"><option value="Accommodation">🛏️ Accommodation</option><option value="Travel">✈️ Travel</option><option value="Food">🍜 Food</option><option value="Activity" selected>❤️ Activity</option></select><button class="btn light small" onclick="setMapRegion('kyushu')">Kyushu</button><button class="btn light small" onclick="setMapRegion('hokkaido')">Hokkaido</button><button class="btn light small" onclick="setMapRegion('all')">All Japan</button><button class="btn light small" onclick="enableMapPin()">＋ Add custom pin</button></div><div id="tripMap" role="application" aria-label="Interactive trip map"></div><div class="field" style="margin-top:14px"><label for="cartoKey">FREE ENGLISH MAP KEY</label><div style="display:flex;gap:7px"><input id="cartoKey" type="password" autocomplete="off" placeholder="Paste your free Tracestrack key" style="min-width:0;flex:1"><button class="btn small" onclick="saveMapStyleKey()">Apply</button></div><p class="small-note">Get a free personal-use key from <a href="https://tracestrack.com/docs/" target="_blank" rel="noopener">Tracestrack API docs</a> (choose the free Intro plan). No Google billing account is needed. The English tile layer prioritises English labels, but some names may remain Japanese if English names are not available.</p></div><p class="small-note">Search requires an internet connection. Choose a category, then tap “Add custom pin” and tap the map, or search for a place and save it.</p><div id="pinList"></div></div></section>
-<section id="itinerary"><div class="section-head"><h2>My itinerary</h2><button class="btn small" onclick="addDay()">＋ Add day</button></div><div id="dayList"></div></section>
+<section id="itinerary"><div class="section-head"><h2>My itinerary</h2><div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end"><button class="btn light small" onclick="exportItineraryPDF()">⇩ Export PDF</button><button class="btn small" onclick="addDay()">＋ Add day</button></div></div><div id="dayList"></div></section>
 
 <section id="food">
 <div class="section-head">
@@ -132,6 +152,7 @@ details.edit-mode .edit-controls{
 
 </main><footer>Japan Winter Adventure · 17–26 January 2027 ☃️ · Data saved on Tyra device</footer></div>
 <div class="modal" id="modal" onclick="if(event.target.id==='modal')closeModal()"><div class="sheet" id="sheet"></div></div>
+<div id="pdfExport" aria-hidden="true"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 const KEY='japanTrip2027PWA';
@@ -249,6 +270,14 @@ $('#budgetList').innerHTML=data.expenses.length?data.expenses.map((x,i)=>`
 </div>
 </div>`).join(''):'<p class="muted">No expenses recorded yet.</p>';
 $('#totalBudget').textContent=money(data.expenses.reduce((s,x)=>s+Number(x.amount||0),0));renderPins();save();}
+function exportItineraryPDF(){
+  const days=(data.days||[]).map((d,i)=>{
+    const activities=(d.plans||[]).map(p=>`<div class="pdf-point"><div class="pdf-time">${esc(p.time||'Anytime')}</div><b>${esc(p.title||'Activity')}</b>${p.detail?`<div class="pdf-detail">${esc(p.detail)}</div>`:''}</div>`).join('');
+    return `<section class="pdf-day"><div class="pdf-date">${esc(d.date||`DAY ${i+1}`)}</div><h2>${esc(d.place||'Travel day')}</h2>${d.tag?`<div class="pdf-tag">${esc(d.tag)}</div>`:''}${d.plan?`<p class="pdf-overview">${esc(d.plan)}</p>`:''}${activities?`<div class="pdf-timeline">${activities}</div>`:'<p class="pdf-detail">No extra activities added yet.</p>'}<div class="pdf-tag" style="margin-top:10px">${d.done?'✓ Completed':'○ Not completed'}</div></section>`;
+  }).join('');
+  $('#pdfExport').innerHTML=`<h1>${esc(data.title||'My Travel Itinerary')}</h1><p class="pdf-subtitle">${esc(data.subtitle||'')}${data.subtitle?'<br>':''}Created from your travel planner</p>${days||'<p>No itinerary days added yet.</p>'}<div class="pdf-footer">${esc(data.title||'Travel Itinerary')} · Generated from your planner</div>`;
+  window.print();
+}
 function modal(title,body){$('#sheet').innerHTML=`<div class="sheethead"><h3>${title}</h3><button class="close" onclick="closeModal()">×</button></div>${body}`;$('#modal').classList.add('open')}
 function closeModal(){$('#modal').classList.remove('open')}
 function field(label,id,value='',type='text',placeholder=''){return `<div class="field"><label>${label}</label><input id="${id}" type="${type}" value="${esc(value)}" placeholder="${placeholder}"></div>`}
